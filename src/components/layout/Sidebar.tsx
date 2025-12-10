@@ -109,6 +109,11 @@ const Icons = {
             <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"></path>
         </svg>
     ),
+    Heart: () => (
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path>
+        </svg>
+    ),
 };
 
 interface NavItem {
@@ -134,6 +139,7 @@ const navigation: NavSection[] = [
             { name: 'Members', href: '/members', icon: 'Users' },
             { name: 'Announcements', href: '/announcements', icon: 'Bell' },
             { name: 'Events', href: '/events', icon: 'Calendar' },
+            { name: 'Cohort Buzz', href: '/cohort-buzz', icon: 'Heart' },
             { name: 'Gallery', href: '/gallery', icon: 'Image' },
         ],
     },
@@ -143,7 +149,6 @@ const navigation: NavSection[] = [
             { name: 'Interview Experiences', href: '/interviews', icon: 'Briefcase' },
             { name: 'Interview Prep AI', href: '/interview-prep', icon: 'Sparkles' },
             { name: 'CV Repository', href: '/cv-repository', icon: 'FileText' },
-            { name: 'Opportunities', href: '/opportunities', icon: 'TrendingUp' },
         ],
     },
     {
@@ -252,21 +257,6 @@ export function Sidebar({ isOpen, onClose, isAdmin = false }: SidebarProps) {
                         </div>
                     )}
                 </nav>
-
-                {/* Bottom Actions */}
-                <div style={{ borderTop: '1px solid var(--border-light)', paddingTop: 'var(--space-md)' }}>
-                    <Link href="/settings" className="nav-item" onClick={onClose}>
-                        <Icons.Settings />
-                        Settings
-                    </Link>
-                    <button
-                        className="nav-item"
-                        style={{ width: '100%', border: 'none', background: 'none', textAlign: 'left' }}
-                    >
-                        <Icons.LogOut />
-                        Log Out
-                    </button>
-                </div>
             </aside>
         </>
     );

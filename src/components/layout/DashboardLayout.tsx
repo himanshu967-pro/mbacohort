@@ -4,7 +4,6 @@ import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Sidebar, MobileMenuButton } from './Sidebar';
-import AIChatWidget from '@/components/features/AIChatWidget';
 import { FeedbackPopup, EngagementNudge } from '@/components/features';
 import { createClient } from '@/lib/supabase/client';
 
@@ -261,9 +260,6 @@ export function DashboardLayout({ children, user }: DashboardLayoutProps) {
                     {children}
                 </main>
             </div>
-
-            {/* AI Chat Widget */}
-            <AIChatWidget />
 
             {/* Smart Engagement Popups */}
             <FeedbackPopup />

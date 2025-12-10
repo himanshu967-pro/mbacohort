@@ -74,6 +74,21 @@ export default async function DashboardPage() {
         .eq('id', user.id)
         .single();
 
+    // Get counts for stats
+    const [membersResult, interviewsResult, resumesResult, eventsResult] = await Promise.all([
+        supabase.from('users').select('id', { count: 'exact', head: true }),
+        supabase.from('interview_experiences').select('id', { count: 'exact', head: true }),
+        supabase.from('resumes').select('id', { count: 'exact', head: true }),
+        supabase.from('events').select('id', { count: 'exact', head: true }).gte('event_date', new Date().toISOString().split('T')[0])
+    ]);
+
+    const stats = {
+        members: membersResult.count || 67,
+        interviews: interviewsResult.count || 0,
+        cvs: resumesResult.count || 0,
+        events: eventsResult.count || 0
+    };
+
     const fullName = profile?.name || user.email?.split('@')[0] || 'User';
     const firstName = fullName.split(' ')[0]; // Get first name only
     const isAdmin = profile?.is_admin || false;
@@ -92,37 +107,37 @@ export default async function DashboardPage() {
 
             {/* Stats Grid */}
             <div className="stats-grid" style={{ marginBottom: 'var(--space-2xl)' }}>
-                <div className="stat-card">
+                <Link href="/members" className="stat-card" style={{ textDecoration: 'none', cursor: 'pointer' }}>
                     <div className="stat-icon primary">
                         <UsersIcon />
                     </div>
-                    <div className="stat-value">67</div>
+                    <div className="stat-value">{stats.members}</div>
                     <div className="stat-label">Cohort Members</div>
-                </div>
+                </Link>
 
-                <div className="stat-card">
+                <Link href="/interviews" className="stat-card" style={{ textDecoration: 'none', cursor: 'pointer' }}>
                     <div className="stat-icon accent">
                         <BriefcaseIcon />
                     </div>
-                    <div className="stat-value">0</div>
+                    <div className="stat-value">{stats.interviews}</div>
                     <div className="stat-label">Interview Experiences</div>
-                </div>
+                </Link>
 
-                <div className="stat-card">
+                <Link href="/cv-repository" className="stat-card" style={{ textDecoration: 'none', cursor: 'pointer' }}>
                     <div className="stat-icon warning">
                         <FileTextIcon />
                     </div>
-                    <div className="stat-value">0</div>
+                    <div className="stat-value">{stats.cvs}</div>
                     <div className="stat-label">CVs Shared</div>
-                </div>
+                </Link>
 
-                <div className="stat-card">
+                <Link href="/events" className="stat-card" style={{ textDecoration: 'none', cursor: 'pointer' }}>
                     <div className="stat-icon success">
                         <CalendarIcon />
                     </div>
-                    <div className="stat-value">0</div>
+                    <div className="stat-value">{stats.events}</div>
                     <div className="stat-label">Upcoming Events</div>
-                </div>
+                </Link>
             </div>
 
             {/* Quick Actions */}

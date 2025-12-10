@@ -91,39 +91,41 @@ function MemberCard({ member }: MemberCardProps) {
                 )}
 
                 {/* Company with Logo */}
-                {member.company && (
+                {member.company && !member.company.includes(',') && (
                     <div style={{
                         display: 'flex',
                         alignItems: 'center',
                         gap: 'var(--space-sm)',
                         marginBottom: 'var(--space-md)'
                     }}>
-                        <CompanyLogo
-                            company={member.company.split(',')[0].trim()}
-                            size="sm"
-                        />
+                        <CompanyLogo company={member.company} size="sm" />
                         <p style={{
                             fontSize: '0.875rem',
                             color: 'var(--text-secondary)',
-                            margin: 0
+                            margin: 0,
+                            display: '-webkit-box',
+                            WebkitLineClamp: 1,
+                            WebkitBoxOrient: 'vertical',
+                            overflow: 'hidden'
                         }}>
-                            {member.company.split(',')[0].trim()}
+                            {member.company}
                         </p>
                     </div>
                 )}
 
-                {/* Bio (truncated) */}
-                {member.bio && (
+                {/* Company without Logo (multiple companies) */}
+                {member.company && member.company.includes(',') && (
                     <p style={{
-                        fontSize: '0.8125rem',
-                        color: 'var(--text-muted)',
-                        marginBottom: 'var(--space-lg)',
+                        fontSize: '0.875rem',
+                        color: 'var(--text-secondary)',
+                        margin: 0,
+                        marginBottom: 'var(--space-md)',
                         display: '-webkit-box',
                         WebkitLineClamp: 2,
                         WebkitBoxOrient: 'vertical',
                         overflow: 'hidden'
                     }}>
-                        {member.bio}
+                        {member.company}
                     </p>
                 )}
 

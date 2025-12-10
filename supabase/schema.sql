@@ -159,6 +159,35 @@ CREATE TABLE IF NOT EXISTS feedback (
 );
 
 -- ============================================
+-- COMMENTS TABLE (for events and announcements)
+-- ============================================
+CREATE TABLE IF NOT EXISTS comments (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+  content TEXT NOT NULL,
+  parent_type TEXT NOT NULL, -- 'event' or 'announcement'
+  parent_id UUID NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_comments_parent ON comments(parent_type, parent_id);
+
+-- ============================================
+-- KUDOS TABLE (for feedback wall)
+-- ============================================
+CREATE TABLE IF NOT EXISTS kudos (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  from_user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+  to_user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+  message TEXT NOT NULL,
+  category TEXT DEFAULT 'appreciation', -- 'appreciation', 'thank you', 'shoutout'
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_kudos_to_user ON kudos(to_user_id);
+CREATE INDEX IF NOT EXISTS idx_kudos_from_user ON kudos(from_user_id);
+
+-- ============================================
 -- ROW LEVEL SECURITY (RLS) POLICIES
 -- ============================================
 
@@ -224,8 +253,14 @@ CREATE POLICY "Users can delete own resumes" ON resumes
 CREATE POLICY "Events viewable by all authenticated" ON events
   FOR SELECT USING (auth.role() = 'authenticated');
 
+CREATE POLICY "Users can create events" ON events
+  FOR INSERT WITH CHECK (auth.uid() = created_by);
+
 CREATE POLICY "Announcements viewable by all authenticated" ON announcements
   FOR SELECT USING (auth.role() = 'authenticated');
+
+CREATE POLICY "Users can create announcements" ON announcements
+  FOR INSERT WITH CHECK (auth.uid() = created_by);
 
 CREATE POLICY "Resources viewable by all authenticated" ON resources
   FOR SELECT USING (auth.role() = 'authenticated');
@@ -244,6 +279,27 @@ CREATE POLICY "Feedback viewable by admins" ON feedback
   FOR SELECT USING (
     EXISTS (SELECT 1 FROM users WHERE id = auth.uid() AND is_admin = true)
   );
+
+-- Comments: All authenticated can read, users can manage their own
+ALTER TABLE comments ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Comments viewable by all authenticated" ON comments
+  FOR SELECT USING (auth.role() = 'authenticated');
+
+CREATE POLICY "Users can create comments" ON comments
+  FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can delete own comments" ON comments
+  FOR DELETE USING (auth.uid() = user_id);
+
+-- Kudos: All authenticated can read, users can create
+ALTER TABLE kudos ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Kudos viewable by all authenticated" ON kudos
+  FOR SELECT USING (auth.role() = 'authenticated');
+
+CREATE POLICY "Users can create kudos" ON kudos
+  FOR INSERT WITH CHECK (auth.uid() = from_user_id);
 
 -- ============================================
 -- STORAGE BUCKETS

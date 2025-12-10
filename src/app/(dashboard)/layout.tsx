@@ -1,6 +1,7 @@
 import { DashboardLayout } from '@/components/layout';
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
+import FeedbackButton from '@/components/features/FeedbackButton';
 
 export default async function DashboardRootLayout({
     children,
@@ -32,6 +33,7 @@ export default async function DashboardRootLayout({
     return (
         <DashboardLayout user={userInfo}>
             {children}
+            <FeedbackButton />
         </DashboardLayout>
     );
 }

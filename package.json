@@ -12,7 +12,9 @@
     "@google/generative-ai": "^0.24.1",
     "@supabase/ssr": "^0.8.0",
     "@supabase/supabase-js": "^2.87.1",
+    "cloudinary": "^2.8.0",
     "next": "16.0.8",
+    "next-cloudinary": "^6.17.5",
     "react": "19.2.1",
     "react-dom": "19.2.1"
   },
@@ -21,6 +23,7 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "dotenv": "^17.2.3",
     "eslint": "^9",
     "eslint-config-next": "16.0.8",
     "groq-sdk": "^0.37.0",
