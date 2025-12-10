@@ -79,8 +79,23 @@ export default async function DashboardPage() {
         supabase.from('users').select('id', { count: 'exact', head: true }),
         supabase.from('interview_experiences').select('id', { count: 'exact', head: true }),
         supabase.from('resumes').select('id', { count: 'exact', head: true }),
-        supabase.from('events').select('id', { count: 'exact', head: true }).gte('event_date', new Date().toISOString().split('T')[0])
+        supabase.from('events').select('id', { count: 'exact', head: true }).gte('event_date', new Date().toISOString())
     ]);
+
+    // Get upcoming events (next 5)
+    const { data: upcomingEvents } = await supabase
+        .from('events')
+        .select('id, title, event_date, location, event_type')
+        .gte('event_date', new Date().toISOString())
+        .order('event_date', { ascending: true })
+        .limit(5);
+
+    // Get recent announcements (last 3)
+    const { data: recentAnnouncements } = await supabase
+        .from('announcements')
+        .select('id, title, created_at')
+        .order('created_at', { ascending: false })
+        .limit(3);
 
     const stats = {
         members: membersResult.count || 67,
@@ -92,6 +107,17 @@ export default async function DashboardPage() {
     const fullName = profile?.name || user.email?.split('@')[0] || 'User';
     const firstName = fullName.split(' ')[0]; // Get first name only
     const isAdmin = profile?.is_admin || false;
+
+    const formatEventDate = (dateString: string) => {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-US', {
+            weekday: 'short',
+            month: 'short',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    };
 
     return (
         <div>
@@ -254,13 +280,36 @@ export default async function DashboardPage() {
                             View all <ArrowRightIcon />
                         </Link>
                     </div>
-                    <div className="card-body">
-                        <div className="empty-state" style={{ padding: 'var(--space-xl)' }}>
-                            <BellIcon />
-                            <p style={{ marginTop: 'var(--space-md)', fontSize: '0.875rem' }}>
-                                No announcements yet
-                            </p>
-                        </div>
+                    <div className="card-body" style={{ padding: 0 }}>
+                        {recentAnnouncements && recentAnnouncements.length > 0 ? (
+                            <div>
+                                {recentAnnouncements.map((ann: any, idx: number) => (
+                                    <Link
+                                        key={ann.id}
+                                        href="/announcements"
+                                        style={{
+                                            display: 'block',
+                                            padding: 'var(--space-md)',
+                                            borderBottom: idx < recentAnnouncements.length - 1 ? '1px solid var(--border-light)' : 'none',
+                                            textDecoration: 'none',
+                                            color: 'inherit'
+                                        }}
+                                    >
+                                        <div style={{ fontWeight: 500, marginBottom: '0.25rem' }}>{ann.title}</div>
+                                        <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                                            {new Date(ann.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                                        </div>
+                                    </Link>
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="empty-state" style={{ padding: 'var(--space-xl)' }}>
+                                <BellIcon />
+                                <p style={{ marginTop: 'var(--space-md)', fontSize: '0.875rem' }}>
+                                    No announcements yet
+                                </p>
+                            </div>
+                        )}
                     </div>
                 </div>
 
@@ -284,13 +333,37 @@ export default async function DashboardPage() {
                             View all <ArrowRightIcon />
                         </Link>
                     </div>
-                    <div className="card-body">
-                        <div className="empty-state" style={{ padding: 'var(--space-xl)' }}>
-                            <CalendarIcon />
-                            <p style={{ marginTop: 'var(--space-md)', fontSize: '0.875rem' }}>
-                                No upcoming events
-                            </p>
-                        </div>
+                    <div className="card-body" style={{ padding: 0 }}>
+                        {upcomingEvents && upcomingEvents.length > 0 ? (
+                            <div>
+                                {upcomingEvents.map((event: any, idx: number) => (
+                                    <Link
+                                        key={event.id}
+                                        href="/events"
+                                        style={{
+                                            display: 'block',
+                                            padding: 'var(--space-md)',
+                                            borderBottom: idx < upcomingEvents.length - 1 ? '1px solid var(--border-light)' : 'none',
+                                            textDecoration: 'none',
+                                            color: 'inherit'
+                                        }}
+                                    >
+                                        <div style={{ fontWeight: 500, marginBottom: '0.25rem' }}>{event.title}</div>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                                            <span>{formatEventDate(event.event_date)}</span>
+                                            {event.location && <span>📍 {event.location}</span>}
+                                        </div>
+                                    </Link>
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="empty-state" style={{ padding: 'var(--space-xl)' }}>
+                                <CalendarIcon />
+                                <p style={{ marginTop: 'var(--space-md)', fontSize: '0.875rem' }}>
+                                    No upcoming events
+                                </p>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
