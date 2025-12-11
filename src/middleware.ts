@@ -3,7 +3,7 @@ import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
 // Routes that don't require authentication
-const publicRoutes = ['/login', '/signup', '/forgot-password']
+const publicRoutes = ['/login', '/signup', '/forgot-password', '/api/warmup']
 
 export async function middleware(request: NextRequest) {
     let supabaseResponse = NextResponse.next({
